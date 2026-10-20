@@ -1,6 +1,6 @@
 # Product Explorer
 
-A Flutter mobile app that browses products from the [DummyJSON](https://dummyjson.com) public API using **BLoC** state management and **clean architecture**.
+A Flutter mobile app that browses products from the [DummyJSON](https://dummyjson.com) public API using **BLoC**, **clean architecture**, **Dio**, **Freezed**, and **GetIt + Injectable**.
 
 ## Features
 
@@ -14,13 +14,27 @@ A Flutter mobile app that browses products from the [DummyJSON](https://dummyjso
 
 ```text
 lib/
-├── core/                 # constants, errors, networking, theme
-├── injection/            # lightweight dependency wiring
+├── core/                 # constants, errors, Dio client, theme
+├── injection/            # GetIt + Injectable DI setup
 └── features/products/
-    ├── data/             # models, remote data source, repository impl
+    ├── data/
+    │   ├── datasources/  # remote API access
+    │   ├── models/       # Freezed + json_serializable DTOs
+    │   ├── mappers/      # model ↔ entity mapping
+    │   └── repositories/
     ├── domain/           # entities, repository contract, use cases
     └── presentation/     # BLoC, pages, widgets
 ```
+
+## Stack
+
+| Concern | Package |
+| --- | --- |
+| HTTP | `dio` |
+| Models | `freezed` + `json_serializable` |
+| Mapping | dedicated mapper classes |
+| DI | `get_it` + `injectable` |
+| State | `flutter_bloc` |
 
 ## API
 
@@ -33,7 +47,14 @@ GET https://dummyjson.com/products/{id}
 
 ```bash
 flutter pub get
+dart run build_runner build --delete-conflicting-outputs
 flutter run
+```
+
+Regenerate Freezed / Injectable code after model or DI changes:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 ## State management

@@ -1,3 +1,5 @@
+import 'package:injectable/injectable.dart';
+
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/product_model.dart';
@@ -9,6 +11,7 @@ abstract class ProductRemoteDataSource {
   Future<ProductModel> getProductById(int id);
 }
 
+@LazySingleton(as: ProductRemoteDataSource)
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   ProductRemoteDataSourceImpl(this._apiClient);
 
@@ -22,8 +25,8 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
     final json = await _apiClient.get(
       ApiConstants.productsEndpoint,
       queryParameters: {
-        'limit': '$limit',
-        'skip': '$skip',
+        'limit': limit,
+        'skip': skip,
       },
     );
     return ProductPageModel.fromJson(json);

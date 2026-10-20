@@ -13,8 +13,7 @@ class ProductListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          Injection.createProductListBloc()..add(const ProductListStarted()),
+      create: (_) => getIt<ProductListBloc>()..add(const ProductListStarted()),
       child: const _ProductListView(),
     );
   }

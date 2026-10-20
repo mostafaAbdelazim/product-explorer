@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/product.dart';
@@ -8,9 +9,9 @@ import '../../domain/usecases/get_product_by_id.dart';
 part 'product_detail_event.dart';
 part 'product_detail_state.dart';
 
+@injectable
 class ProductDetailBloc extends Bloc<ProductDetailEvent, ProductDetailState> {
-  ProductDetailBloc({required this.getProductById})
-      : super(const ProductDetailState()) {
+  ProductDetailBloc(this.getProductById) : super(const ProductDetailState()) {
     on<ProductDetailRequested>(_onRequested);
     on<ProductDetailRetried>(_onRetried);
   }

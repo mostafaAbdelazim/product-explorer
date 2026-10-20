@@ -1,52 +1,62 @@
-import 'dart:convert';
-import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:injectable/injectable.dart';
 
-import 'package:http/http.dart' as http;
-
-import '../constants/api_constants.dart';
 import '../error/exceptions.dart';
 
+@lazySingleton
 class ApiClient {
-  ApiClient({http.Client? client}) : _client = client ?? http.Client();
+  ApiClient(this._dio);
 
-  final http.Client _client;
+  final Dio _dio;
 
   Future<Map<String, dynamic>> get(
     String path, {
-    Map<String, String>? queryParameters,
+    Map<String, dynamic>? queryParameters,
   }) async {
-    final uri = Uri.parse('${ApiConstants.baseUrl}$path').replace(
-      queryParameters: queryParameters,
-    );
-
     try {
-      final response = await _client.get(uri).timeout(
-            const Duration(seconds: 20),
-          );
+      final response = await _dio.get<dynamic>(
+        path,
+        queryParameters: queryParameters,
+      );
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        final decoded = jsonDecode(response.body);
-        if (decoded is Map<String, dynamic>) {
-          return decoded;
-        }
-        throw const ServerException('Unexpected response format');
+      final data = response.data;
+      if (data is Map<String, dynamic>) {
+        return data;
       }
 
-      throw ServerException(
-        'Request failed with status ${response.statusCode}',
-      );
-    } on SocketException {
-      throw const NetworkException();
-    } on http.ClientException {
-      throw const NetworkException();
+      throw const ServerException('Unexpected response format');
+    } on DioException catch (e) {
+      throw _mapDioException(e);
     } on ServerException {
-      rethrow;
-    } on NetworkException {
       rethrow;
     } catch (_) {
       throw const ServerException();
     }
   }
 
-  void dispose() => _client.close();
+  Exception _mapDioException(DioException exception) {
+    switch (exception.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+      case DioExceptionType.transformTimeout:
+      case DioExceptionType.connectionError:
+        return const NetworkException();
+      case DioExceptionType.badResponse:
+        final statusCode = exception.response?.statusCode;
+        return ServerException(
+          statusCode == null
+              ? 'Request failed'
+              : 'Request failed with status $statusCode',
+        );
+      case DioExceptionType.cancel:
+        return const ServerException('Request cancelled');
+      case DioExceptionType.badCertificate:
+      case DioExceptionType.unknown:
+        if (exception.error is FormatException) {
+          return const ServerException('Unexpected response format');
+        }
+        return const NetworkException();
+    }
+  }
 }

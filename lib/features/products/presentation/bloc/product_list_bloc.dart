@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/failures.dart';
@@ -9,8 +10,9 @@ import '../../domain/usecases/get_products.dart';
 part 'product_list_event.dart';
 part 'product_list_state.dart';
 
+@injectable
 class ProductListBloc extends Bloc<ProductListEvent, ProductListState> {
-  ProductListBloc({required this.getProducts}) : super(const ProductListState()) {
+  ProductListBloc(this.getProducts) : super(const ProductListState()) {
     on<ProductListStarted>(_onStarted);
     on<ProductListRefreshed>(_onRefreshed);
     on<ProductListLoadMore>(_onLoadMore);

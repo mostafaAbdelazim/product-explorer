@@ -1,10 +1,15 @@
+import 'package:injectable/injectable.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/entities/product_page.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../datasources/product_remote_data_source.dart';
+import '../mappers/product_mapper.dart';
+import '../mappers/product_page_mapper.dart';
 
+@LazySingleton(as: ProductRepository)
 class ProductRepositoryImpl implements ProductRepository {
   ProductRepositoryImpl(this._remoteDataSource);
 
@@ -20,7 +25,7 @@ class ProductRepositoryImpl implements ProductRepository {
         limit: limit,
         skip: skip,
       );
-      return result.toEntity();
+      return ProductPageMapper.toEntity(result);
     } on NetworkException catch (e) {
       throw NetworkFailure(e.message);
     } on ServerException catch (e) {
@@ -34,7 +39,7 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<Product> getProductById(int id) async {
     try {
       final result = await _remoteDataSource.getProductById(id);
-      return result.toEntity();
+      return ProductMapper.toEntity(result);
     } on NetworkException catch (e) {
       throw NetworkFailure(e.message);
     } on ServerException catch (e) {

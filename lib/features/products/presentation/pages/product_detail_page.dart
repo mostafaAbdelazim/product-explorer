@@ -19,8 +19,8 @@ class ProductDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => Injection.createProductDetailBloc()
-        ..add(ProductDetailRequested(productId)),
+      create: (_) =>
+          getIt<ProductDetailBloc>()..add(ProductDetailRequested(productId)),
       child: _ProductDetailView(initialTitle: initialTitle),
     );
   }

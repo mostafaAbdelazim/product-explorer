@@ -1,8 +1,11 @@
+import 'package:injectable/injectable.dart';
+
 import '../entities/product_page.dart';
 import '../repositories/product_repository.dart';
 
+@injectable
 class GetProducts {
-  const GetProducts(this._repository);
+  GetProducts(this._repository);
 
   final ProductRepository _repository;
 

@@ -1,27 +1,19 @@
-import '../../domain/entities/product_page.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'product_model.dart';
 
-class ProductPageModel extends ProductPage {
-  const ProductPageModel({
-    required super.products,
-    required super.total,
-    required super.skip,
-    required super.limit,
-  });
+part 'product_page_model.freezed.dart';
+part 'product_page_model.g.dart';
 
-  factory ProductPageModel.fromJson(Map<String, dynamic> json) {
-    final productsJson = json['products'] as List<dynamic>? ?? const [];
+@freezed
+abstract class ProductPageModel with _$ProductPageModel {
+  const factory ProductPageModel({
+    @Default(<ProductModel>[]) List<ProductModel> products,
+    @Default(0) int total,
+    @Default(0) int skip,
+    @Default(0) int limit,
+  }) = _ProductPageModel;
 
-    return ProductPageModel(
-      products: productsJson
-          .whereType<Map<String, dynamic>>()
-          .map(ProductModel.fromJson)
-          .toList(),
-      total: json['total'] as int? ?? 0,
-      skip: json['skip'] as int? ?? 0,
-      limit: json['limit'] as int? ?? 0,
-    );
-  }
-
-  ProductPage toEntity() => this;
+  factory ProductPageModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductPageModelFromJson(json);
 }
